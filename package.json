@@ -5,6 +5,10 @@
   "private": true,
   "dependencies": {
     "express": "3.x",
-    "d3": "3"
+    "d3": "3",
+    "phantomjs": "1.9",
+    "phantom": "0.5",
+    "temp": "0.6"
+
   }
 }

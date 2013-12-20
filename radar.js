@@ -36,7 +36,7 @@ RadarChart.prototype.mergeConfig = function(options) {
       }
     }
   }
-  cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
+  //cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
   return cfg;
 };
 RadarChart.prototype.labelSegments = function(g, data, radius, format, cfg) {
