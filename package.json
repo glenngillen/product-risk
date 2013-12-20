@@ -1,0 +1,10 @@
+{
+  "name": "product-risk",
+  "description": "A way of visualizing product risk",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.x",
+    "d3": "3"
+  }
+}
