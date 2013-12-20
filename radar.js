@@ -26,10 +26,8 @@ var RadarChart = function() {
      ExtraWidthY: 100,
      color: d3.scale.category10() 
   };
-};
-
-RadarChart.prototype.draw = function(id, d, options) {
-  var cfg = this.defaultConfig;
+  this.mergeConfig = function(options) {
+    var cfg = this.defaultConfig;
     if('undefined' !== typeof options){
       for(var i in options){
         if('undefined' !== typeof options[i]){
@@ -38,27 +36,32 @@ RadarChart.prototype.draw = function(id, d, options) {
       }
     }
     cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
-    var allAxis = (d[0].map(function(i, j){return i.axis}));
-    var total = allAxis.length;
-    var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
-    var Format = d3.format('%');
-    d3.select(id).select("svg").remove();
-    
-    var g = d3.select(id)
-            .append("svg")
-            .attr("width", cfg.w+cfg.ExtraWidthX)
-            .attr("height", cfg.h+cfg.ExtraWidthY)
-            .append("g")
-            .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
-            ;
-
-    var tooltip;
-    
+    return cfg;
+  };
+  this.labelSegments = function(g, data, radius, format, cfg) {
+    //Text indicating at what % each level is
+    for(var j=0; j<cfg.levels; j++){
+      var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+      g.selectAll(".levels")
+       .data(data)
+       .enter()
+       .append("svg:text")
+       .attr("x", function(d){return levelFactor*(1-cfg.factor*Math.sin(0));})
+       .attr("y", function(d){return levelFactor*(1-cfg.factor*Math.cos(0));})
+       .attr("class", "legend")
+       .style("font-family", "sans-serif")
+       .style("font-size", "10px")
+       .attr("transform", "translate(" + (cfg.w/2-levelFactor + cfg.ToRight) + ", " + (cfg.h/2-levelFactor) + ")")
+       .attr("fill", "#737373")
+       .text(format((j+1)*cfg.maxValue/cfg.levels));
+    }
+  };
+  this.drawWebs = function(g, data, radius, total, cfg) {
     //Circular segments
     for(var j=0; j<cfg.levels-1; j++){
       var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
       g.selectAll(".levels")
-       .data(allAxis)
+       .data(data)
        .enter()
        .append("svg:line")
        .attr("x1", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(i*cfg.radians/total));})
@@ -71,25 +74,29 @@ RadarChart.prototype.draw = function(id, d, options) {
        .style("stroke-width", "0.3px")
        .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
     }
+  }
+};
 
-    //Text indicating at what % each level is
-    for(var j=0; j<cfg.levels; j++){
-      var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
-      g.selectAll(".levels")
-       .data([1]) //dummy data
-       .enter()
-       .append("svg:text")
-       .attr("x", function(d){return levelFactor*(1-cfg.factor*Math.sin(0));})
-       .attr("y", function(d){return levelFactor*(1-cfg.factor*Math.cos(0));})
-       .attr("class", "legend")
-       .style("font-family", "sans-serif")
-       .style("font-size", "10px")
-       .attr("transform", "translate(" + (cfg.w/2-levelFactor + cfg.ToRight) + ", " + (cfg.h/2-levelFactor) + ")")
-       .attr("fill", "#737373")
-       .text(Format((j+1)*cfg.maxValue/cfg.levels));
-    }
-    
-    series = 0;
+RadarChart.prototype.draw = function(id, d, options) {
+  var cfg = this.mergeConfig(options);
+  var allAxis = (d[0].map(function(i, j){return i.axis}));
+  var total = allAxis.length;
+  var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
+  var Format = d3.format('%');
+  d3.select(id).select("svg").remove();
+  var g = d3.select(id)
+    .append("svg")
+    .attr("width", cfg.w+cfg.ExtraWidthX)
+    .attr("height", cfg.h+cfg.ExtraWidthY)
+    .append("g")
+    .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
+    ;
+
+  var tooltip;
+
+  this.drawWebs(g, allAxis, radius, total, cfg);
+  this.labelSegments(g, [1], radius, Format, cfg);
+  series = 0;
 
     var axis = g.selectAll(".axis")
             .data(allAxis)
