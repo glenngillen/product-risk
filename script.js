@@ -61,7 +61,7 @@ var mycfg = {
 //Call function to draw the Radar chart
 //Will expect that data is in %'s
 
-chart = new RadarChart();
+chart = new KanbanRiskRadarChart();
 chart.draw("#chart", d, mycfg);
 
 ////////////////////////////////////////////

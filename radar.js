@@ -26,54 +26,54 @@ var RadarChart = function() {
      ExtraWidthY: 100,
      color: d3.scale.category10() 
   };
-  this.mergeConfig = function(options) {
-    var cfg = this.defaultConfig;
-    if('undefined' !== typeof options){
-      for(var i in options){
-        if('undefined' !== typeof options[i]){
-          cfg[i] = options[i];
-        }
+}
+RadarChart.prototype.mergeConfig = function(options) {
+  var cfg = this.defaultConfig;
+  if('undefined' !== typeof options){
+    for(var i in options){
+      if('undefined' !== typeof options[i]){
+        cfg[i] = options[i];
       }
     }
-    cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
-    return cfg;
-  };
-  this.labelSegments = function(g, data, radius, format, cfg) {
-    //Text indicating at what % each level is
-    for(var j=0; j<cfg.levels; j++){
-      var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
-      g.selectAll(".levels")
-       .data(data)
-       .enter()
-       .append("svg:text")
-       .attr("x", function(d){return levelFactor*(1-cfg.factor*Math.sin(0));})
-       .attr("y", function(d){return levelFactor*(1-cfg.factor*Math.cos(0));})
-       .attr("class", "legend")
-       .style("font-family", "sans-serif")
-       .style("font-size", "10px")
-       .attr("transform", "translate(" + (cfg.w/2-levelFactor + cfg.ToRight) + ", " + (cfg.h/2-levelFactor) + ")")
-       .attr("fill", "#737373")
-       .text(format((j+1)*cfg.maxValue/cfg.levels));
-    }
-  };
-  this.drawWebs = function(g, data, radius, total, cfg) {
-    //Circular segments
-    for(var j=0; j<cfg.levels-1; j++){
-      var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
-      g.selectAll(".levels")
-       .data(data)
-       .enter()
-       .append("svg:line")
-       .attr("x1", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(i*cfg.radians/total));})
-       .attr("y1", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(i*cfg.radians/total));})
-       .attr("x2", function(d, i){return levelFactor*(1-cfg.factor*Math.sin((i+1)*cfg.radians/total));})
-       .attr("y2", function(d, i){return levelFactor*(1-cfg.factor*Math.cos((i+1)*cfg.radians/total));})
-       .attr("class", "line")
-       .style("stroke", "grey")
-       .style("stroke-opacity", "0.75")
-       .style("stroke-width", "0.3px")
-       .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
-    }
+  }
+  cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
+  return cfg;
+};
+RadarChart.prototype.labelSegments = function(g, data, radius, format, cfg) {
+  //Text indicating at what % each level is
+  for(var j=0; j<cfg.levels; j++){
+    var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+    g.selectAll(".levels")
+     .data(data)
+     .enter()
+     .append("svg:text")
+     .attr("x", function(d){return levelFactor*(1-cfg.factor*Math.sin(0));})
+     .attr("y", function(d){return levelFactor*(1-cfg.factor*Math.cos(0));})
+     .attr("class", "legend")
+     .style("font-family", "sans-serif")
+     .style("font-size", "10px")
+     .attr("transform", "translate(" + (cfg.w/2-levelFactor + cfg.ToRight) + ", " + (cfg.h/2-levelFactor) + ")")
+     .attr("fill", "#737373")
+     .text(format((j+1)*cfg.maxValue/cfg.levels));
+  }
+};
+RadarChart.prototype.drawWebs = function(g, data, radius, total, cfg) {
+  //Circular segments
+  for(var j=0; j<cfg.levels-1; j++){
+    var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+    g.selectAll(".levels")
+     .data(data)
+     .enter()
+     .append("svg:line")
+     .attr("x1", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(i*cfg.radians/total));})
+     .attr("y1", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(i*cfg.radians/total));})
+     .attr("x2", function(d, i){return levelFactor*(1-cfg.factor*Math.sin((i+1)*cfg.radians/total));})
+     .attr("y2", function(d, i){return levelFactor*(1-cfg.factor*Math.cos((i+1)*cfg.radians/total));})
+     .attr("class", "line")
+     .style("stroke", "grey")
+     .style("stroke-opacity", "0.75")
+     .style("stroke-width", "0.3px")
+     .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
   }
 };
 
@@ -95,7 +95,7 @@ RadarChart.prototype.draw = function(id, d, options) {
   var tooltip;
 
   this.drawWebs(g, allAxis, radius, total, cfg);
-  this.labelSegments(g, [1], radius, Format, cfg);
+  this.labelSegments(g, allAxis, radius, Format, cfg);
   series = 0;
 
     var axis = g.selectAll(".axis")
