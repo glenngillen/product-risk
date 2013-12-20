@@ -60,7 +60,9 @@ var mycfg = {
 
 //Call function to draw the Radar chart
 //Will expect that data is in %'s
-RadarChart.draw("#chart", d, mycfg);
+
+chart = new RadarChart();
+chart.draw("#chart", d, mycfg);
 
 ////////////////////////////////////////////
 /////////// Initiate legend ////////////////
