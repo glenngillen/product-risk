@@ -102,10 +102,4 @@ function drawRadar(params) {
   return el;
 }
 
-params = { name: 'Detached Resourcesa',
-          market_risk: 'Spoiler',
-          product_lifecycle: 'Mid',
-          delay_impact: 'Discoverable',
-          technical_difficulty: 'Done it before',
-          cost_of_delay: 'Standard' }
-drawRadar(params);
+drawRadar(getQueryParams(document.location.search));

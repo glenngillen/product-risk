@@ -7,10 +7,11 @@ var express = require('express')
 
 var app = express();
 app.get('/radar.png', function(req, res){
+  var search = url.parse(req.url, true).search
   var params = url.parse(req.url, true).query
   phantom.create(function(ph) {
     ph.createPage(function(page) {
-      page.open('./index.html', function(status) {
+      page.open('./index.html'+search, function(status) {
         if (status !== 'success') {
           console.log('FAIL to load the address');
           res.writeHead(500, {'Content-Type': 'image/png'});
