@@ -3,6 +3,7 @@ var express = require('express')
     , d3 = require('d3')
     , phantom = require('phantom')
     , temp = require('temp')
+    , fs = require('fs')
 
 var app = express();
 app.get('/radar.png', function(req, res){
@@ -12,14 +13,18 @@ app.get('/radar.png', function(req, res){
       page.open('./index.html', function(status) {
         if (status !== 'success') {
           console.log('FAIL to load the address');
+          res.writeHead(500, {'Content-Type': 'image/png'});
           res.end();
         } else {
-          var filename = temp.path({suffix: '.png'});
-          page.render(filename);
-          console.log(filename)
-          ph.exit();
-          res.end();
-          //res.send(pngImage)
+          page.renderBase64('PNG', function(data) {
+            ph.exit();
+            var buffer = new Buffer(data, 'base64');
+            res.writeHead(200, {
+              'Content-Type': 'image/png',
+              'Content-Length': buffer.length
+            });
+            res.end(buffer);
+          });
         }
       });
     })
