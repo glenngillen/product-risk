@@ -23,7 +23,6 @@ app.get('/radar.png', function(req, res){
   mc.get(search, function(err, data, key) {
     if (data) {
       console.log('SUCCESS: Fetched from cache.');
-      console.log(data)
       respondWithPNG(res, data.toString());
     } else {
       phantom.create(function(ph) {
@@ -38,7 +37,6 @@ app.get('/radar.png', function(req, res){
                 ph.exit();
                 mc.set(search, data, function(err, success) {
                   console.log('SUCCESS: Stored in cache.');
-                  console.log(data)
                   respondWithPNG(res, data);
                 }, (60 * 60 * 24 * 30));
               });
