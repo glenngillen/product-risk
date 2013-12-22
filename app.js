@@ -8,18 +8,21 @@ var express = require('express')
 
 var app = express();
 var mc = memjs.Client.create();
+var respondWithPNG = function(response, data) {
+  var buffer = new Buffer(data, 'base64');
+  response.writeHead(200, {
+    'Content-Type': 'image/png',
+    'Content-Length': buffer.length
+  });
+  response.end(buffer);
+};
 
 app.get('/radar.png', function(req, res){
   var search = url.parse(req.url, true).search
   var params = url.parse(req.url, true).query
   mc.get(search, function(err, data, key) {
     if (data) {
-      var buffer = new Buffer(data, 'base64');
-      res.writeHead(200, {
-        'Content-Type': 'image/png',
-        'Content-Length': buffer.length
-      });
-      res.end(buffer);
+      respondWithPNG(data);
     } else {
       phantom.create(function(ph) {
         ph.createPage(function(page) {
@@ -32,12 +35,7 @@ app.get('/radar.png', function(req, res){
               page.renderBase64('PNG', function(data) {
                 ph.exit();
                 mc.set(search, data, function(err, success) {
-                  var buffer = new Buffer(data, 'base64');
-                  res.writeHead(200, {
-                    'Content-Type': 'image/png',
-                    'Content-Length': buffer.length
-                  });
-                  res.end(buffer);
+                  respondWithPNG(data);
                 }, (60 * 60 * 24 * 30));
               });
             }
@@ -46,7 +44,6 @@ app.get('/radar.png', function(req, res){
       });
     }
   });
-
 });
 
 var port = process.env.PORT || 5000
